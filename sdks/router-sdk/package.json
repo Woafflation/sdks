@@ -1,5 +1,6 @@
 {
   "name": "@woafflation/router-sdk",
+  "version": "1.0.0",
   "description": "An sdk for routing swaps using Uniswap v2 and Uniswap v3.",
   "repository": "https://github.com/Woafflation/sdks.git",
   "keywords": [
@@ -28,6 +29,7 @@
     "@uniswap/v4-sdk": "^1.20.0"
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.26.0",
     "@types/jest": "^24.0.25",
     "prettier": "^2.4.1",
     "tsdx": "^0.14.1"
