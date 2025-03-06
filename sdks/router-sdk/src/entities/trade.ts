@@ -121,10 +121,12 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
     const poolIdentifierSet = new Set<string>()
     for (const { route } of this.swaps) {
       for (const pool of route.pools) {
-        if (pool instanceof V4Pool) {
-          poolIdentifierSet.add(pool.poolId)
-        } else if (pool instanceof V3Pool) {
-          poolIdentifierSet.add(V3Pool.getAddress(pool.token0, pool.token1, pool.fee))
+        if (pool instanceof V4Pool || 'poolId' in pool) {
+          poolIdentifierSet.add((pool as V4Pool).poolId)
+        } else if (pool instanceof V3Pool || 'fee' in pool) {
+          poolIdentifierSet.add(
+            V3Pool.getAddress((pool as V3Pool).token0, (pool as V3Pool).token1, (pool as V3Pool).fee)
+          )
         } else if (pool instanceof Pair) {
           const pair = pool
           poolIdentifierSet.add(Pair.getAddress(pair.token0, pair.token1))
@@ -182,11 +184,11 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
     outputAmount: CurrencyAmount<TOutput>
     outputAmountNative: CurrencyAmount<TOutput> | undefined
   } {
+    const nativeInputCurrency = this.swaps.find(({ inputAmount }) => inputAmount.currency.isNative)
+    const nativeOutputCurrency = this.swaps.find(({ outputAmount }) => outputAmount.currency.isNative)
     // Find native currencies for reduce below
-    const inputNativeCurrency = this.swaps.find(({ inputAmount }) => inputAmount.currency.isNative)?.inputAmount
-      .currency
-    const outputNativeCurrency = this.swaps.find(({ outputAmount }) => outputAmount.currency.isNative)?.outputAmount
-      .currency
+    const inputNativeCurrency = nativeInputCurrency ? nativeInputCurrency.inputAmount.currency : undefined
+    const outputNativeCurrency = nativeOutputCurrency ? nativeOutputCurrency.outputAmount.currency : undefined
 
     return {
       inputAmount: this.inputAmount,
